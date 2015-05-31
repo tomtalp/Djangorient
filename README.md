@@ -1,2 +1,2 @@
 # Djangorient
-An OrientDB backend for Django
+An OrientDB backend for Django based on Rexster & Bulbs
