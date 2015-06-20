@@ -38,8 +38,8 @@ class HttpClient(object):
 
 	def _POST_request(self, uri, data = None):
 		headers = self._request_headers
-		if data:
-			headers['Content-Length'] = str(len(data))
+		# if data:
+		# 	headers['Content-Length'] = str(len(data))
 
 		resp, content = self._http.request(
 			uri = uri,

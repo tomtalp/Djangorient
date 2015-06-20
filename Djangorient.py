@@ -30,7 +30,7 @@ class DjangorientClient(object):
 														class_name = class_name)
 		self._http_client.send_request(uri, 'POST')
 
-		#self.add_properties_to_class(class_name, class_properties)
+		self.add_properties_to_class(class_name, class_properties)
 
 	def add_properties_to_class(self, class_name, class_properties):
 		"""
