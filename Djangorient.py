@@ -15,6 +15,7 @@ class DjangorientClient(object):
 							self._db_name,
 							self._username, 
 							self._password)
+		print "Created Djangorient Client!"
 
 	def disconnect(self):
 		disconn_uri = self._base_uri + '/disconnect/'
@@ -49,6 +50,14 @@ class DjangorientClient(object):
 
 		self._http_client.send_request(uri, 'POST', data)
 
+	def run_sql_query(self, query):
+		uri = '{base}/query/{db_name}/sql/{query}'.format(
+														base = self._base_uri,
+														db_name = self._db_name,
+														query = query)
+
+		results = self._http_client.send_request(uri, 'GET')
+		return results
 
 	## TODO - Implement a proper test
 	def test_connection(self):

@@ -2,12 +2,21 @@ from djangorient.Djangorient import *
 from djangorient.DjangorientProperties import *
 
 class DjangorientModel(object):
-	_client = DjangorientClient()
+	def test_conn(selft):
+		return client
 		
 
 class DjangorientNode(DjangorientModel):
 	def __init__(self):
 		super(DjangorientNode, self).__init__()
+
+	def all(self):
+		pass
+
+	def raw_sql(self, user_query):
+		results = client.run_sql_query(user_query)
+		return results
+		print results
 
 	def create(self, **kwargs):
 		return self

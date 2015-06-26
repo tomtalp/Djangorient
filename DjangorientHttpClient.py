@@ -3,6 +3,7 @@ import json
 
 class HttpClient(object):
 	def __init__(self, base_uri, db_name, username, password):
+		print "Created HTTP Client!"
 		self._http = httplib2.Http()
 		self._http.add_credentials(username, password)
 		self._request_headers = self._get_headers()
@@ -47,7 +48,7 @@ class HttpClient(object):
 			headers = headers,
 			body = data
 		)
-		return DjangorientResults(resp, content)
+		return DjangorientResults(resp, content, uri)
 
 	def _GET_request(self, uri):
 		resp, content = self._http.request(
@@ -56,13 +57,13 @@ class HttpClient(object):
 			headers = self._request_headers,
 		)
 
-		return DjangorientResults(resp, content)
+		return DjangorientResults(resp, content, uri)
 
 class DjangorientResults(object):
-	def __init__(self, resp, content):
+	def __init__(self, resp, content, uri = None):
 		self._resp = resp
 		self._content = content
-
+		self._uri = uri
 		self._check_resp()
 
 	def __str__(self):
