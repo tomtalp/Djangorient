@@ -51,10 +51,11 @@ class DjangorientClient(object):
 		self._http_client.send_request(uri, 'POST', data)
 
 	def run_sql_query(self, query):
+		no_whitespace_query = query.replace(' ', '%20')
 		uri = '{base}/query/{db_name}/sql/{query}'.format(
 														base = self._base_uri,
 														db_name = self._db_name,
-														query = query)
+														query = no_whitespace_query)
 
 		results = self._http_client.send_request(uri, 'GET')
 		return results

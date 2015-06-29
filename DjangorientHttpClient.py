@@ -1,22 +1,33 @@
 import httplib2
+import base64
 import json
 
 class HttpClient(object):
 	def __init__(self, base_uri, db_name, username, password):
 		print "Created HTTP Client!"
 		self._http = httplib2.Http()
-		self._http.add_credentials(username, password)
-		self._request_headers = self._get_headers()
 
+		self._username = username
+		self._password = password
+		self._base64_auth = self._get_base64_auth()
+
+		self._request_headers = self._get_headers()
 		self._base_uri = base_uri
 		self._db_name = db_name
+
+	def _get_base64_auth(self):
+		"""
+		Return the authentication credentials in a base64 format
+		"""
+		return base64.encodestring(self._username + ':' + self._password)
 
 	def _get_headers(self):
 		"""
 		Headers for HTTP request
 		"""
 		return {'Content-Type': 'application/json; charset=UTF-8',
-				'Accept-Encoding': 'gzip,deflate'}
+				'Accept-Encoding': 'gzip,deflate',
+				'Authorization': 'Basic ' + self._base64_auth}
 
 	def send_request(self, uri, method, data=None):
 		if type(data) is str:
