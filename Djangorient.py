@@ -1,5 +1,7 @@
 from django.conf import settings
 from djangorient.DjangorientHttpClient import HttpClient
+import json
+import urllib
 
 
 class DjangorientClient(object):
@@ -15,9 +17,12 @@ class DjangorientClient(object):
 							self._db_name,
 							self._username, 
 							self._password)
-		print "Created Djangorient Client!"
 
 	def disconnect(self):
+		"""
+		Send a GET request to the disconnect URI 
+		(kills the session?)
+		"""
 		disconn_uri = self._base_uri + '/disconnect/'
 		self._http_client.send_request(disconn_uri, 'GET')
 
@@ -50,15 +55,29 @@ class DjangorientClient(object):
 
 		self._http_client.send_request(uri, 'POST', data)
 
-	def run_sql_query(self, query):
-		no_whitespace_query = query.replace(' ', '%20')
-		uri = '{base}/query/{db_name}/sql/{query}'.format(
+	def run_sql_query(self, query, method = 'GET'):
+		"""
+		Run a SQL query via the command service.
+		Using 'command' instead of query because we need idempotent queries support.
+		"""
+		#no_whitespace_query = query.replace(' ', '%20')
+		urlencoded_query = urllib.quote(query)
+		uri = '{base}/command/{db_name}/sql/{query}'.format(
 														base = self._base_uri,
 														db_name = self._db_name,
-														query = no_whitespace_query)
+														query = urlencoded_query)
 
-		results = self._http_client.send_request(uri, 'GET')
+		results = self._http_client.send_request(uri, method)
 		return results
+
+	def add_to_class(self, class_name, values):
+		"""
+		Add a document (node or edge) to a class
+		"""
+		json_values = json.dumps(values)
+		insertion_sql_query = "INSERT INTO {class_name} content {json_content}".format(class_name = class_name, json_content = json_values)
+		return self.run_sql_query(insertion_sql_query, method = 'POST')
+
 
 	## TODO - Implement a proper test
 	def test_connection(self):

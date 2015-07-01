@@ -2,24 +2,54 @@ from djangorient.Djangorient import *
 from djangorient.DjangorientProperties import *
 
 class DjangorientModel(object):
-	def test_conn(selft):
-		return client
-		
+	pass
 
 class DjangorientNode(DjangorientModel):
 	def __init__(self):
 		super(DjangorientNode, self).__init__()
+		self._class_name = self.__class__.__name__
 
 	def all(self):
 		pass
+		
+	def _get_properties(self):
+		"""
+		Return all the properties defined by the user in the class
+		(Will be used by subclasses that inherit DjangorientNode)
+		"""
+		properties = dict()
+		cls = self.__class__
 
-	def raw_sql(self, user_query):
-		results = client.run_sql_query(user_query)
-		return results
-		print results
+		for key, val in cls.__dict__.iteritems():
+			if filter(lambda x: x is type(val), all_types):
+				properties[key] = val
+		return properties
+
+	def _get_property_value(self, property_value, property_type):
+		"""
+		Validate the property value with its selected type, and try to convert if incompatible
+		"""
+		try:
+			val = property_type.validate_type(property_value, try_converting = True)
+		except Exception, e:
+			raise e
+
+		return val
 
 	def create(self, **kwargs):
-		return self
+		"""
+		Create a document in the database, based on a certain class.
+		"""
+		class_properties = self._get_properties()
+		property_values = dict()
+
+		for key, val in kwargs.iteritems():
+			if key not in class_properties:
+				raise Exception("The property {property} is not a part of the class {cls}".format(property = key, cls = self._class_name))
+			else:
+				property_values[key] = self._get_property_value(val, class_properties[key])
+
+		return client.add_to_class(self._class_name, property_values)
 
 
 class DjangorientBuilder(object):
@@ -42,7 +72,7 @@ class DjangorientBuilder(object):
 
 				# Test if the property is of a recognized type
 				if filter(lambda x: x is type(obj_property), all_types):
-					self.user_classes[class_name][attr] = obj_property.return_orientdb_type()
+					self.user_classes[class_name][attr] = obj_property.get_orientdb_type()
 
 	def write_classes(self):
 		"""
@@ -50,9 +80,3 @@ class DjangorientBuilder(object):
 		"""
 		for class_name, class_properties in self.user_classes.iteritems():
 			client.create_class(class_name, class_properties)
-
-
-# d1 = DjangorientBuilder()
-# d1.build_classes_dict()
-# d1.write_classes()
-#client._http_client.create_class()
