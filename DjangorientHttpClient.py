@@ -1,6 +1,7 @@
 import httplib2
 import base64
 import json
+from djangorient.DjangorientManager import *
 
 class HttpClient(object):
 	def __init__(self, base_uri, db_name, username, password):
@@ -59,7 +60,7 @@ class HttpClient(object):
 			headers = headers,
 			body = data
 		)
-		return DjangorientResults(resp, content, uri)
+		return DjangorientResultSet(resp, content, uri)
 
 	def _GET_request(self, uri):
 		resp, content = self._http.request(
@@ -68,19 +69,5 @@ class HttpClient(object):
 			headers = self._request_headers,
 		)
 
-		return DjangorientResults(resp, content, uri)
-
-class DjangorientResults(object):
-	def __init__(self, resp, content, uri = None):
-		self._resp = resp
-		self._content = content
-		self._uri = uri
-		self._check_resp()
-
-	def __str__(self):
-		return self._content
-
-	def _check_resp(self):
-		if self._resp['status'] == '401':
-			raise Exception('Not authorized! Please enter a valid username & pw')
+		return DjangorientResultSet(resp, content, uri)
 

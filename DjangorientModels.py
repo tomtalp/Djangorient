@@ -10,7 +10,7 @@ class DjangorientNode(DjangorientModel):
 		self._class_name = self.__class__.__name__
 
 	def all(self):
-		pass
+		return client.get_all(self._class_name)
 		
 	def _get_properties(self):
 		"""

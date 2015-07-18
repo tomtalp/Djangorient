@@ -78,6 +78,11 @@ class DjangorientClient(object):
 		insertion_sql_query = "INSERT INTO {class_name} content {json_content}".format(class_name = class_name, json_content = json_values)
 		return self.run_sql_query(insertion_sql_query, method = 'POST')
 
+	def get_all(self, class_name):
+		return self.run_sql_query(
+				"SELECT * FROM {class_name}".format(class_name = class_name),
+				method = "POST")
+
 
 	## TODO - Implement a proper test
 	def test_connection(self):
@@ -91,4 +96,4 @@ class DjangorientClient(object):
 
 	
 client = DjangorientClient()
-client.test_connection()
+#client.test_connection()
