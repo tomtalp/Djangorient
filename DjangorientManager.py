@@ -20,6 +20,8 @@ class DjangorientResultSet(object):
 			results_list = resp_dict['result']
 		except KeyError:
 			return None
+		except TypeError: # Raised when results_dict is empty
+			return None
 	
 		for r in results_list:
 			values_dict = dict()
@@ -34,9 +36,6 @@ class DjangorientResultSet(object):
 
 		return results
 
-	def __str__(self):
-		return self._content
-
 	def raw_json_resp(self):
 		"""
 		JSON formatted representation of the query results
@@ -47,7 +46,8 @@ class DjangorientResultSet(object):
 		"""
 		Query results in a Python dictionary
 		"""
-		return json.loads(str(self._content))
+		if self._content:
+			return json.loads(str(self._content))
 
 	def _check_resp(self):
 		if self._resp['status'] == '401':

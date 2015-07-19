@@ -79,10 +79,29 @@ class DjangorientClient(object):
 		return self.run_sql_query(insertion_sql_query, method = 'POST')
 
 	def get_all(self, class_name):
+		"""
+		Run a SELECT * query to get all documents of a class
+		"""
 		return self.run_sql_query(
 				"SELECT * FROM {class_name}".format(class_name = class_name),
 				method = "POST")
 
+	def filter_func(self, class_name, filter_items):
+		"""
+		Run a query to get all documents of a class, with the applied filters.
+		"""
+		base_query = "SELECT * FROM {cls_name} WHERE {filters}"
+
+		filters_list = []
+
+		for key, val in filter_items.iteritems():
+			filters_list.append("{key} = '{val}'".format(key = key, val = val))
+
+		filters_str = " AND ".join(filters_list)
+
+		final_query = base_query.format(cls_name = class_name, filters = filters_str)
+
+		return self.run_sql_query(final_query)
 
 	## TODO - Implement a proper test
 	def test_connection(self):

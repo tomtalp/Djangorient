@@ -10,7 +10,31 @@ class DjangorientNode(DjangorientModel):
 		self._class_name = self.__class__.__name__
 
 	def all(self):
+		"""
+		Return all class documents
+		"""
 		return client.get_all(self._class_name)
+
+	def filter(self, **kwargs):
+		"""
+		Get documents of a class that match the filters.
+
+		I.E user_posts = blog_posts.filter(author = 'George')
+		"""
+		class_properties = self._get_properties()
+		filter_items = dict()
+
+		for key, val in kwargs.iteritems():
+			# TODO - In the future we'll add filters that aren't a part of
+			# the class properties.
+			# I.E - greater_than/lesser_than properties, between dates etc
+			if key not in class_properties:
+				raise Exception("The property {property} is not a part of the class {cls}".format(property = key, cls = self._class_name))
+			else:
+				filter_items[key] = val
+
+		return client.filter_func(self._class_name, filter_items)
+
 		
 	def _get_properties(self):
 		"""
