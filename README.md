@@ -17,9 +17,7 @@ class Animal(DjangorientNode):
 
 Working with your DB
 ```
-p = Person()
+Person.objects.create(name = "Tom", age = 120)
 
-p.create(name = "Tom", age = 120)
-
-results = p.filter(name = "Tom")
+results = Person.objects.filter(name = "Tom")
 ```
