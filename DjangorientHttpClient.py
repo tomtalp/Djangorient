@@ -1,7 +1,7 @@
 import httplib2
 import base64
 import json
-from djangorient.DjangorientManager import *
+from djangorient.DjangorientResultsManager import *
 
 class HttpClient(object):
 	def __init__(self, base_uri, db_name, username, password):

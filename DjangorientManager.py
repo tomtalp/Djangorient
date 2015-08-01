@@ -1,54 +1,72 @@
-import json
+from djangorient.Djangorient import *
+from djangorient.DjangorientProperties import all_types
 
-class DjangorientResultSet(object):
-	def __init__(self, resp, content, uri = None):
-		self._resp = resp
-		self._content = content
-		self._uri = uri
-		self._check_resp()
-		self.results = self._parse_resp_content()
+class DjangorientObjectManager(object):
 
-	def _parse_resp_content(self):
+	def __init__(self, cls):
+		self._cls = cls
+		self._class_name = self._cls.__name__
+
+	def all(self):
 		"""
-		Parse query results into the results generator
+		Return all class documents
 		"""
-		resp_dict = self._get_results_dict()
+		return client.get_all(self._class_name)
 
-		results = []
+	def filter(self, **kwargs):
+		"""
+		Get documents of a class that match the filters.
+		"""
+		class_properties = self._get_properties()
+		filter_items = dict()
 
+		for key, val in kwargs.iteritems():
+			# TODO - In the future we'll add filters that aren't a part of
+			# the class properties.
+			# I.E - greater_than/lesser_than properties, between dates etc
+			if key not in class_properties:
+				raise Exception("The property {property} is not a part of the class {cls}".format(property = key, cls = self._class_name))
+			else:
+				filter_items[key] = val
+
+		return client.filter_func(self._class_name, filter_items)
+
+		
+	def _get_properties(self):
+		"""
+		Return all the properties defined by the user in the class
+		(Will be used by subclasses that inherit DjangorientNode)
+		"""
+		properties = dict()
+		cls = self._cls
+
+		for key, val in cls.__dict__.iteritems():
+			if filter(lambda x: x is type(val), all_types):
+				properties[key] = val
+		return properties
+
+	def _get_property_value(self, property_value, property_type):
+		"""
+		Validate the property value with its selected type, and try to convert if incompatible
+		"""
 		try:
-			results_list = resp_dict['result']
-		except KeyError:
-			return None
-		except TypeError: # Raised when results_dict is empty
-			return None
-	
-		for r in results_list:
-			values_dict = dict()
-			values_dict['id'] = str(r['@rid'])
-			values_dict['class_name'] = str(r['@class'])
+			val = property_type.validate_type(property_value, try_converting = True)
+		except Exception, e:
+			raise e
 
-			for key, val in r.iteritems():
-				if not key.startswith('@'):
-					values_dict[key] = val
+		return val
 
-			results.append(type(values_dict['class_name'], (), values_dict))
-
-		return results
-
-	def raw_json_resp(self):
+	def create(self, **kwargs):
 		"""
-		JSON formatted representation of the query results
+		Create a document in the database, based on a certain class.
 		"""
-		return str(self._content)
+		class_properties = self._get_properties()
+		property_values = dict()
 
-	def _get_results_dict(self):
-		"""
-		Query results in a Python dictionary
-		"""
-		if self._content:
-			return json.loads(str(self._content))
+		for key, val in kwargs.iteritems():
+			if key not in class_properties:
+				raise Exception("The property {property} is not a part of the class {cls}".format(property = key, cls = self._class_name))
+			else:
+				property_values[key] = self._get_property_value(val, class_properties[key])
 
-	def _check_resp(self):
-		if self._resp['status'] == '401':
-			raise Exception('Not authorized! Please enter a valid username & pw')
+		return client.add_to_class(self._class_name, property_values)
