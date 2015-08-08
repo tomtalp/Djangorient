@@ -37,15 +37,20 @@ class DjangorientResultSet(object):
 	
 		for r in results_list:
 			values_dict = dict()
-			values_dict['id'] = str(r['@rid'])
-			values_dict['class_name'] = str(r['@class'])
+
+			if '@rid' in r:
+				values_dict['id'] = str(r['@rid'])
+			
+			if '@class' in r:
+				values_dict['class_name'] = str(r['@class'])
 
 			for key, val in r.iteritems():
 				if not key.startswith('@'):
 					values_dict[key] = val
 
-			# TODO - Add a better repr for a single DjangorientResult
-			results.append(type(values_dict['class_name'], (), values_dict))
+			# Only add classes that were queried to the results
+			if 'class_name' in values_dict:
+				results.append(type(values_dict['class_name'], (), values_dict))
 
 		return results
 
@@ -59,8 +64,13 @@ class DjangorientResultSet(object):
 		"""
 		Query results in a Python dictionary
 		"""
-		if self._content:
-			return json.loads(str(self._content))
+		try:
+			if self._content:
+				return json.loads(str(self._content))
+		except ValueError, e:
+			error_msg = "There seems to be an error... The response we received is - \n" + str(self._content)
+			raise Exception(error_msg)
+		
 
 	def _check_resp(self):
 		if self._resp['status'] == '401':

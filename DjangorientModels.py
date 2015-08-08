@@ -27,6 +27,10 @@ class DjangorientNode(object):
 		#super(DjangorientNode, self).__init__()
 		self._class_name = self.__class__.__name__
 
+	@classmethod
+	def _get_superclass(cls):
+		return 'V'
+
 
 class DjangorientBuilder(object):
 	"""
@@ -36,6 +40,8 @@ class DjangorientBuilder(object):
 
 	def __init__(self):
 		self.user_classes = dict()
+		self.build_classes_dict()
+		self.write_classes()
 
 	def build_classes_dict(self):
 		subclasses = DjangorientNode.__subclasses__()
@@ -43,12 +49,14 @@ class DjangorientBuilder(object):
 		for cls in subclasses:
 			class_name = cls.__name__
 			self.user_classes[class_name] = dict()
+			self.user_classes[class_name]['superClass'] = cls._get_superclass()
 			for attr in dir(cls):
 				obj_property = getattr(cls, attr)
 
 				# Test if the property is of a recognized type
 				if filter(lambda x: x is type(obj_property), all_types):
 					self.user_classes[class_name][attr] = obj_property.get_orientdb_type()
+
 
 	def write_classes(self):
 		"""
