@@ -86,7 +86,7 @@ class DjangorientClient(object):
 		Execute a SQL query via the command service.
 		Using 'command' instead of query because we need idempotent queries support.
 		"""
-		#no_whitespace_query = query.replace(' ', '%20')
+		query = ' '.join(query.split()) # Get rid of \t and \n chars
 		urlencoded_query = urllib.quote(query)
 		uri = '{base}/command/{db_name}/sql/{query}'.format(
 														base = self._base_uri,
@@ -109,7 +109,14 @@ class DjangorientClient(object):
 		Create an Edge from the incoming id to the outcoming id
 		"""
 		json_values = json.dumps(values)
-		creation_sql_query = "CREATE EDGE {edge_name} FROM {in_id} TO {out_id} CONTENT {json_content}".format(edge_name = edge_name, in_id = in_id, out_id = out_id, json_content = json_values)
+		creation_sql_query = """CREATE EDGE {edge_name} 
+								FROM {in_id} TO {out_id} 
+								CONTENT {json_content}""".format(
+									edge_name = edge_name, 
+									in_id = in_id, 
+									out_id = out_id, 
+									json_content = json_values)
+		#return creation_sql_query
 		return self.exec_sql_query(creation_sql_query, method = 'POST')		
 
 	def get_all(self, class_name):
@@ -134,7 +141,6 @@ class DjangorientClient(object):
 		filters_str = " AND ".join(filters_list)
 
 		final_query = base_query.format(cls_name = class_name, filters = filters_str)
-
 		return self.exec_sql_query(final_query)
 
 	## TODO - Implement a proper test
