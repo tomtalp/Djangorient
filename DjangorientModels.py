@@ -3,25 +3,25 @@ from djangorient.DjangorientProperties import *
 from djangorient.DjangorientManager import *
 
 
-class DjangorientBaseModel(type):
+class DjangorientBaseNode(type):
 	"""
 	Metaclass for Nodes & Edges
 	"""
 	def __new__(cls, name, bases, attrs):
 		#super(DjangorientBaseModel, cls).__new__(name, bases, attrs)
-		super_new = super(DjangorientBaseModel, cls).__new__
+		super_new = super(DjangorientBaseNode, cls).__new__
 
 		# DjangorientNode/Edge don't require any additional attributes, so return them with no additions
 		if name in ['DjangorientNode', 'DjangorientEdge']:
 			return super_new(cls, name, bases, attrs)
 		
 		new_cls = super_new(cls, name, bases, attrs)
-		setattr(new_cls, 'objects', DjangorientObjectManager(new_cls))
+		setattr(new_cls, 'objects', DjangorientNodeManager(new_cls))
 		
 		return new_cls
 		
 class DjangorientNode(object):
-	__metaclass__ = DjangorientBaseModel
+	__metaclass__ = DjangorientBaseNode
 
 	def __init__(self):
 		#super(DjangorientNode, self).__init__()
@@ -31,6 +31,33 @@ class DjangorientNode(object):
 	def _get_superclass(cls):
 		return 'V'
 
+class DjangorientBaseEdge(type):
+	"""
+	Metaclass for Nodes & Edges
+	"""
+	def __new__(cls, name, bases, attrs):
+		#super(DjangorientBaseModel, cls).__new__(name, bases, attrs)
+		super_new = super(DjangorientBaseEdge, cls).__new__
+
+		# DjangorientNode/Edge don't require any additional attributes, so return them with no additions
+		if name in ['DjangorientNode', 'DjangorientEdge']:
+			return super_new(cls, name, bases, attrs)
+		
+		new_cls = super_new(cls, name, bases, attrs)
+		setattr(new_cls, 'objects', DjangorientEdgeManager(new_cls))
+		
+		return new_cls
+
+class DjangorientEdge(object):
+	__metaclass__ = DjangorientBaseEdge
+
+	def __init__(self):
+		#super(DjangorientNode, self).__init__()
+		self._class_name = self.__class__.__name__
+
+	@classmethod
+	def _get_superclass(cls):
+		return 'E'
 
 class DjangorientBuilder(object):
 	"""
@@ -45,6 +72,7 @@ class DjangorientBuilder(object):
 
 	def build_classes_dict(self):
 		subclasses = DjangorientNode.__subclasses__()
+		subclasses += DjangorientEdge.__subclasses__()
 		
 		for cls in subclasses:
 			class_name = cls.__name__

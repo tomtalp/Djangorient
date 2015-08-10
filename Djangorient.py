@@ -44,16 +44,9 @@ class DjangorientClient(object):
 	def create_class(self, class_name, class_properties):
 		"""
 		Creates a class which extends from V or E, via an SQL query 
-		"""
-		uri = '{base}/class/{db_name}/{class_name}/'.format(
-														base = self._base_uri,
-														db_name = self._db_name,
-														class_name = class_name)
-		
+		"""	
 		superclass = class_properties.pop('superClass')
-
 		creation_query = 'CREATE CLASS {cls_name} EXTENDS {superclass}'.format(cls_name = class_name, superclass = superclass)
-
 		self.exec_sql_query(creation_query, 'POST')
 
 		self.add_properties_to_class(class_name, class_properties)
@@ -103,8 +96,6 @@ class DjangorientClient(object):
 		results = self._http_client.send_request(uri, method)
 		return results
 
-	#def create_vertex(self, vertex_name,)
-
 	def add_to_class(self, class_name, values):
 		"""
 		Add a document (node or edge) to a class
@@ -112,6 +103,14 @@ class DjangorientClient(object):
 		json_values = json.dumps(values)
 		insertion_sql_query = "INSERT INTO {class_name} content {json_content}".format(class_name = class_name, json_content = json_values)
 		return self.exec_sql_query(insertion_sql_query, method = 'POST')
+
+	def add_edge(self, edge_name, in_id, out_id, values):
+		"""
+		Create an Edge from the incoming id to the outcoming id
+		"""
+		json_values = json.dumps(values)
+		creation_sql_query = "CREATE EDGE {edge_name} FROM {in_id} TO {out_id} CONTENT {json_content}".format(edge_name = edge_name, in_id = in_id, out_id = out_id, json_content = json_values)
+		return self.exec_sql_query(creation_sql_query, method = 'POST')		
 
 	def get_all(self, class_name):
 		"""
