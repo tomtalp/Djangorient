@@ -3,7 +3,14 @@ import json
 # The maximum number of items to display in a ResultSet.__repr__
 REPR_OUTPUT_SIZE = 10
 
+# Map between orient node/edge properties that are invalid/uncomprehendable
+ORIENT_PROPERTIES_MAPPER = {'in': 'in_vertex',
+							'out': 'out_vertex'} 
+
 class DjangorientResultSet(object):
+	"""
+	Results returned from a query
+	"""
 	def __init__(self, resp, content, uri = None):
 		self._resp = resp
 		self._content = content
@@ -20,22 +27,13 @@ class DjangorientResultSet(object):
 	def __getitem__(self, index):
 		return self.results[index]
 
-	def _parse_resp_content(self):
+	def _build_results_list(self, initial_results_list):
 		"""
-		Parse query results into the results generator
+		Return a list of "types" representing the objects returned from the query
 		"""
-		resp_dict = self._get_results_dict()
-
 		results = []
 
-		try:
-			results_list = resp_dict['result']
-		except KeyError:
-			return None
-		except TypeError: # Raised when results_dict is empty
-			return None
-	
-		for r in results_list:
+		for r in initial_results_list:
 			values_dict = dict()
 
 			if '@rid' in r:
@@ -46,12 +44,29 @@ class DjangorientResultSet(object):
 
 			for key, val in r.iteritems():
 				if not key.startswith('@'):
-					values_dict[key] = val
+					property_name = ORIENT_PROPERTIES_MAPPER.get(key, key)
+					values_dict[property_name] = val
 
 			# Only add classes that were queried to the results
 			if 'class_name' in values_dict:
 				results.append(type(values_dict['class_name'], (), values_dict))
 
+		return results
+
+	def _parse_resp_content(self):
+		"""
+		Parse query results into the results generator
+		"""
+		resp_dict = self._get_results_dict()
+
+		try:
+			results_list = resp_dict['result']
+		except KeyError:
+			return None
+		except TypeError: # Raised when results_dict is empty
+			return None
+		
+		results = self._build_results_list(results_list)
 		return results
 
 	def raw_json_resp(self):
