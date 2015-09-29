@@ -1,6 +1,9 @@
+#from djangorient.Djangorient import *
+#from djangorient.DjangorientProperties import *
+#from djangorient.DjangorientManager import *
 from djangorient.Djangorient import *
-from djangorient.DjangorientProperties import *
-from djangorient.DjangorientManager import *
+from djangorient.models.DjangorientProperties import *
+from djangorient.utils.DjangorientManager import *
 
 
 class DjangorientBaseNode(type):

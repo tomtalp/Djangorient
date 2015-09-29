@@ -1,0 +1,1 @@
+from djangorient.models.DjangorientModels import *

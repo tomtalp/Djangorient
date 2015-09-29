@@ -1,11 +1,12 @@
 from django.conf import settings
-from djangorient.DjangorientHttpClient import HttpClient
+from djangorient.utils.DjangorientHttpClient import HttpClient
 import json
 import urllib
 
 
 class DjangorientClient(object):
 	def __init__(self):
+		print 'asdsss'
 		self._username = settings.DJANGORIENT_SETTINGS['username']
 		self._password = settings.DJANGORIENT_SETTINGS['password']
 		self._db_name = settings.DJANGORIENT_SETTINGS['name']
@@ -155,4 +156,5 @@ class DjangorientClient(object):
 
 	
 client = DjangorientClient()
+#print client
 #client.test_connection()

@@ -1,5 +1,5 @@
 from djangorient.Djangorient import *
-from djangorient.DjangorientProperties import all_types
+from djangorient.models.DjangorientProperties import all_types
 
 class DjangorientBaseManager(object):
 	"""

@@ -1,1 +1,1 @@
-import Djangorient
+from djangorient import Djangorient
