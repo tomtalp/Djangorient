@@ -2,7 +2,9 @@ from djangorient.Djangorient import *
 from djangorient.DjangorientProperties import all_types
 
 class DjangorientBaseManager(object):
-
+	"""
+	Base class for an Edge/Node 'objects' manager
+	"""
 	def __init__(self, cls):
 		self._cls = cls
 		self._class_name = self._cls.__name__
@@ -37,7 +39,9 @@ class DjangorientBaseManager(object):
 		"""
 		Get a class by an id (ID has to match OrientDB ID format, I.E - '#12:2')
 		"""
-		return self.filter(id = id)[0]
+		r = self.filter(id = id)
+		if r.results: 
+			return r[0]
 
 	def _get_properties(self):
 		"""

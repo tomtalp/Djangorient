@@ -1,11 +1,14 @@
 import json
 
+
 # The maximum number of items to display in a ResultSet.__repr__
 REPR_OUTPUT_SIZE = 10
 
 # Map between orient node/edge properties that are invalid/uncomprehendable
 ORIENT_PROPERTIES_MAPPER = {'in': 'in_vertex',
 							'out': 'out_vertex'} 
+
+EXTERNAL_OBJECT_PROPERTIES = ['in', 'in_vertex', 'out', 'out_vertex'] # Properties that represent an external object & require us to query the object
 
 class DjangorientResultSet(object):
 	"""
@@ -27,6 +30,14 @@ class DjangorientResultSet(object):
 	def __getitem__(self, index):
 		return self.results[index]
 
+	# TODO - Fix the "client out of scope" bug, and find a way to replace the id with the actual object
+	def _get_ext_object_by_id(self, obj_id):
+		"""
+		Get the object of the given ID from the DB
+		"""
+		#return client.get_by_id(obj_id)
+		#return self
+
 	def _build_results_list(self, initial_results_list):
 		"""
 		Return a list of "types" representing the objects returned from the query
@@ -46,6 +57,11 @@ class DjangorientResultSet(object):
 				if not key.startswith('@'):
 					property_name = ORIENT_PROPERTIES_MAPPER.get(key, key)
 					values_dict[property_name] = val
+
+					# TODO - Make this work...
+					# Replace ID with the actual object
+					# if property_name in EXTERNAL_OBJECT_PROPERTIES:
+					# 	values_dict[property_name] = self._get_ext_object_by_id(val)
 
 			# Only add classes that were queried to the results
 			if 'class_name' in values_dict:
