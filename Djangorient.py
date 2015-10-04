@@ -6,7 +6,6 @@ import urllib
 
 class DjangorientClient(object):
 	def __init__(self):
-		print 'asdsss'
 		self._username = settings.DJANGORIENT_SETTINGS['username']
 		self._password = settings.DJANGORIENT_SETTINGS['password']
 		self._db_name = settings.DJANGORIENT_SETTINGS['name']

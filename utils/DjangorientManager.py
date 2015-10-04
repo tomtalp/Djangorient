@@ -88,7 +88,7 @@ class DjangorientNodeManager(DjangorientBaseManager):
 			else:
 				property_values[key] = self._get_property_value(val, class_properties[key])
 
-		return client.add_to_class(self._class_name, property_values)
+		return client.add_to_class(self._class_name, property_values)[0]
 
 class DjangorientEdgeManager(DjangorientBaseManager):
 	"""
@@ -116,7 +116,7 @@ class DjangorientEdgeManager(DjangorientBaseManager):
 			else:
 				property_values[key] = self._get_property_value(val, class_properties[key])
 
-		return client.add_edge(self._class_name, in_node.id, out_node.id, property_values)
+		return client.add_edge(self._class_name, in_node.id, out_node.id, property_values)[0]
 
 
 	def _validate_node(self, node):
