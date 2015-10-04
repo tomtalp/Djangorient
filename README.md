@@ -25,6 +25,9 @@ class Person(DjangorientNode):
 class Animal(DjangorientNode):
 	nickname = String()
 
+class Owns(DjangorientEdge):
+	years_owned = Integer()	
+
 ```
 
 ### Working with your data
