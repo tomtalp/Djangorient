@@ -1,4 +1,7 @@
+**Note:** This project isn't maintained anymore, feel free to fork and keep it alive.
+
 # Djangorient
+
 An OrientDB backend for Django. 
 Still in early development stages, feel free to join and help growing.
 
